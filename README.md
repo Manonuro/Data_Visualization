@@ -1,5 +1,5 @@
 # Data_Visualization
-This is a Data Visualization project is for Prosper Loan Data.
+This is a Data Visualization project for Prosper Loan Data.
 #                                           Prosper Loan Data Visualization
 #Summary 
 Prosper Marketplace is a peer-to-peer lending marketplace connecting those who need a loan to those who have extra money to lend. I investigated the performance of Prosper Loan from the Investor and Borrower point of views by looking at the LenderYield and BorrowerAPR and type of loans. I was interested to show the relation between above mentioned variables based on the loan status and borrowers credit ratings. It will be possible to find out what type of loan and to what level of ProsperRating has lowest risk and highest return for investors. In other hand for each borrower can find out what type of loan has lowest BorrwerAPR.
