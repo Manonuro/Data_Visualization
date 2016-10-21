@@ -1,0 +1,200 @@
+<html>
+<div id='chartContainer'>
+  <script src='http://d3js.org/d3.v3.min.js'></script>
+  <script src='http://dimplejs.org/dist/dimple.v2.0.0.min.js'></script>
+  <script type='text/javascript'>
+  var svg = dimple.newSvg('#chartContainer', 1400, 1000);
+  d3.csv('prosperLoanData_wrangled_ProsperScore_filtered4.csv', function (data) {
+          // Filter for ListingCategory (numeric): The category of the listing that the borrower selected when posting their listing: 0 - Not Available, 1 - Debt Consolidation, 2 - Home Improvement, 3 - Business, 4 - Personal Loan, 5 - Student Use, 6 - Auto, 7- Other, 8 - Baby&Adoption, 9 - Boat, 10 - Cosmetic Procedure, 11 - Engagement Ring, 12 - Green Loans, 13 - Household Expenses, 14 - Large Purchases, 15 - Medical/Dental, 16 - Motorcycle, 17 - RV, 18 - Taxes, 19 - Vacation, 20 - Wedding Loans
+          data = dimple.filterData(data, 'ListingCategory', [
+            '0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+            ]);
+
+          // Adding the Loan Type text to the legend.        
+          svg.selectAll('title_text')
+          .data([
+            ' ',' Debt Consolidation',
+            ' ',' Home Improvement',
+            ' ',' Business',
+            ' ',' Student Use',
+            ' ',' Auto',
+            ' ',' Baby&Adoption',
+            ' ',' Boat',
+            ' ',' Cosmetic Procedure',
+            ' ',' Engagement Ring',
+            ' ',' Green Loans',
+            ' ',' Household Expenses',
+            ' ',' Large Purchases',
+            ' ',' Medical/Dental',
+            ' ',' Motorcycle',
+            ' ',' RV',
+            ' ',' Taxes',
+            ' ',' Vacation',
+            ' ',' Wedding Loans',
+            ])
+          .enter()
+          .append('text')
+          .attr('x', 670)
+          .attr('y', function (d, i) { return 207 + i * 8.1; })
+          .style('font-family', 'sans-serif')
+          .style('font-size', '10px')
+          .style('color', 'Black')
+          .text(function (d) { return d; });
+
+          // Create the indicator chart on the right of the main chart
+          var indicator = new dimple.chart(svg, data);
+          // Pick blue as the default and orange for the selected ListingCategory (numeric)
+          var defaultColor = indicator.defaultColors[0];
+          var indicatorColor = indicator.defaultColors[2];
+          // The frame duration for the animation in milliseconds
+          var frame = 1000;
+          var firstTick = false;
+          // Place the indicator bar chart to the right
+          indicator.setBounds(650, 205, 150, 290);
+          // Add ListingCategory along the y axis
+          var y = indicator.addCategoryAxis('y', 'ListingCategory');
+          y.addOrderRule('ListingCategory', 'Desc');
+          // Use the total number of Investors for bar size and hide the axis
+          var x = indicator.addLogAxis('x', 'Loan Count');
+          x.tickFormat = ',1f';
+          x.hidden = true;
+          // Add the bars to the indicator and add event handlers
+          var s = indicator.addSeries(null, dimple.plot.bar);
+          s.addEventHandler('click', onClick);
+          // Draw the side chart
+          indicator.draw();
+          // Remove the title from the y axis
+          y.titleShape.remove();
+          // Remove the lines from the y axis
+          y.shapes.selectAll('line,path').remove();
+          // Move the y axis text inside the plot area
+          y.shapes.selectAll('text')
+          .style('text-anchor', 'start')
+          .style('font-size', '11px')
+          .attr('transform', 'translate(10, 3)');
+
+          // Adding the legend title in Indicator section.
+          svg.selectAll('title_text')
+          .data(['LOAN TYPES', '',
+            'Click bar to select',
+            'and pause. Click again',
+            'to resume animation', '' ,  
+            ])
+          .enter()
+          .append('text')
+          .attr('x', 650)
+          .attr('y', function (d, i) { return 160 + i * 10; })
+          .style('font-family', 'sans-serif')
+          .style('font-size', '10px')
+          .style('color', 'Black')
+          .text(function (d) { return d; });
+
+
+          // Adding note to the indicator section.
+          svg.selectAll('title_text')
+          .data(['Debt Consolidation is the most popular Loan Type',
+            '(The length of the bar charts corresponds ',  
+              ' to the likelihood of loan type approval.) ',
+          ])
+          .enter()
+          .append('text')
+          .attr('x', 550)
+          .attr('y', function (d, i) { return 110 + i * 10; })
+          .style('font-family', 'sans-serif')
+          .style('font-size', '12px')
+          .style('color', 'Black')
+          .text(function (d) { return d; });
+          // Manually set the bar colors
+          s.shapes
+          .attr('rx', 5)
+          .attr('ry', 5)
+          .style('fill', function (d) { return (d.y === 'Completed' ? indicatorColor.fill : defaultColor.fill) })
+          .style('stroke', function (d) { return (d.y === 'Completed' ? indicatorColor.stroke : defaultColor.stroke) })
+          .style('opacity', 0.3);
+          // Draw the main chart
+          var myChart = new dimple.chart(svg, data);
+          myChart.setBounds(120, 160, 500, 350)
+          var mx = myChart.addCategoryAxis('x', 'Prosper Rating Score');
+          mx.addOrderRule('Prosper Rating Score');
+          mx.fontSize = '13px';
+          var my = myChart.addMeasureAxis('y', 'Loan Count');
+          my.addOrderRule('Loan Status');
+          my.fontSize = '13px';
+          my.tickFormat = ',1f';
+          var ms = myChart.addSeries(['aveLenderYield','aveBorrowerAPR','Loan Status'], dimple.plot.bar);
+          myChart.addLegend(220, 120, 410, 60);
+
+          // Adding the main chart legend title.
+          svg.selectAll('title_text')
+          .data(['Loan Status:',
+            ])
+          .enter()
+          .append('text')
+          .attr('x', 130)
+          .attr('y', 130)
+          .style('font-family', 'sans-serif')
+          .style('font-size', '13px')
+          .style('color', 'Black')
+          .text(function (d) { return d; });  
+          
+          // Add a storyboard to the main chart and set the tick event
+          var story = myChart.setStoryboard('ListingCategory', onTick);
+          // Change the frame duration
+          story.frameDuration = frame;
+          // Order the storyboard by term
+          story.addOrderRule('ListingCategory');
+          // Draw the myChart chart
+          myChart.draw();
+
+          // Adding the main chart title.
+          svg.selectAll('title_text')
+          .data(['COMPLETED LOAN RATIO','',
+            'Motorcycle & Engagement Ring loan types have lowest risk of investment',
+            '(The Bigger Blue portion of bars indicates the lower risk of investment in each category of loans)'
+            ])
+          .enter()
+          .append('text')
+          .attr('x', function (d, i) { return 310 - i * 65; })
+          .attr('y', function (d, i) { return 39 + i * 14; })
+          .style('font-family', 'sans-serif')
+          .style('font-size', '12px')
+          .style('color', 'Black')
+          .text(function (d) { return d; });
+
+          
+          // Orphan the legends as they are consistent but by default they
+          // will refresh on tick
+          myChart.legends = [];
+          // Remove the storyboard label because the chart will indicate the
+          // current ListingCategory (numeric) instead of the label
+          story.storyLabel.remove();
+          // On click of the side chart
+          function onClick(e) {
+              // Pause the animation
+              story.pauseAnimation();
+              // If it is already selected resume the animation
+              // otherwise pause and move to the selected month
+              if (e.yValue === story.getFrameValue()) {
+                story.startAnimation();
+              } else {
+                story.goToFrame(e.yValue);
+                story.pauseAnimation();
+              }
+            }
+          // On tick of the main charts storyboard
+          function onTick(e) {
+            if (!firstTick) {
+                  // Color all shapes the same
+                  s.shapes
+                  .transition()
+                  .duration(frame / 2)
+                  .style('fill', function (d) { return (d.y === e ? indicatorColor.fill : defaultColor.fill) })
+                  .style('stroke', function (d) { return (d.y === e ? indicatorColor.stroke : defaultColor.stroke) 
+                  });
+                }
+                firstTick = false;
+              }
+            });
+</script>
+</div>
+</html>
