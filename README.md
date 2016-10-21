@@ -1,7 +1,7 @@
-# Data_Visualization
-This is a Data Visualization project for Prosper Loan Data.
 #                                           Prosper Loan Data Visualization
-#Prosper Loan Data Visualization
+This is a Data Visualization project for Prosper Loan Data.
+
+
 #Summary 
 Prosper Marketplace is a peer-to-peer lending marketplace connecting those who need a loan to those who have extra money to lend. I investigated the performance of Prosper Loan from the Investor and Borrower point of views by looking at the height and color distribution of each bar chart for different loan types. The bar charts show how many loans of each specific types are given to borrowers with different scores and what portion of those loans are completed, defaulted, or charged off. I found two types of loans, Motorcycle & Engagement Ring, have highest ratio of successfully completed loans for all borrowers with different scores. And for borrowers with specific ProsperRating, the “Debt Consolidation” loan type with more than 11000 loans has highest chance to be invested.  
 
